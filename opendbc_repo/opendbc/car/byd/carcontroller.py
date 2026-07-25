@@ -4,7 +4,7 @@ from opendbc.car import Bus, structs
 from opendbc.car.lateral import apply_meas_steer_torque_limits
 from opendbc.car.interfaces import CarControllerBase
 from opendbc.car.byd.bydcan import BydCAN
-from opendbc.car.byd.values import CarControllerParams
+from opendbc.car.byd.values import CAR, CarControllerParams
 
 VisualAlert = structs.CarControl.HUDControl.VisualAlert
 ButtonType = structs.CarState.ButtonEvent.Type
@@ -29,6 +29,11 @@ class CarController(CarControllerBase):
     self.lkas_counter_updated = False
 
     self.apply_accel_last = 0
+
+    # EPS steering feedback forwarding (792 STEERING_TORQUE) only applies to
+    # platforms whose EPS reports on 792 (HAN). The SEAL EPS reports on
+    # 508 STEERING_TORQUE_ANGLE which is forwarded stock for now.
+    self.send_steering_feedback = CP.carFingerprint != CAR.BYD_SEAL_PERFORMANCE_25
 
   def update(self, CC, CC_SP, CS, now_nanos):
     # car control running in 100Hz
@@ -75,11 +80,12 @@ class CarController(CarControllerBase):
                                                      lkas_request_prepare, lkas_active,
                                                      lkas_mode, CS.eps_activated)
       can_sends.append(pack)
-      pack = self.can.create_steering_torque(CS.eps_steering_torque_msg,
-                                             CS.mpc_lkas_output,
-                                             CS.mpc_lkas_request_prepare,
-                                             CS.mpc_lkas_active)
-      can_sends.append(pack)
+      if self.send_steering_feedback:
+        pack = self.can.create_steering_torque(CS.eps_steering_torque_msg,
+                                               CS.mpc_lkas_output,
+                                               CS.mpc_lkas_request_prepare,
+                                               CS.mpc_lkas_active)
+        can_sends.append(pack)
 
       self.apply_torque_last = apply_torque
 

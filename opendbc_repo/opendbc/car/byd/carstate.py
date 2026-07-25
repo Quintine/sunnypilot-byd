@@ -3,7 +3,7 @@ from opendbc.car import Bus, create_button_events, structs
 from opendbc.can.parser import CANParser
 from opendbc.car.common.conversions import Conversions as CV
 from opendbc.car.interfaces import CarStateBase
-from opendbc.car.byd.values import DBC, CANBUS, STEER_THRESHOLD, GEAR_MAP
+from opendbc.car.byd.values import CAR, DBC, CANBUS, STEER_THRESHOLD, GEAR_MAP
 from opendbc.sunnypilot.car.byd.mads import MadsCarState
 
 GearShifter = structs.CarState.GearShifter
@@ -14,6 +14,13 @@ class CarState(CarStateBase, MadsCarState):
   def __init__(self, CP, CP_SP):
     CarStateBase.__init__(self, CP, CP_SP)
     MadsCarState.__init__(self, CP, CP_SP)
+
+    # EPS steering feedback message differs by platform:
+    # HAN uses 792 STEERING_TORQUE, SEAL uses 508 STEERING_TORQUE_ANGLE
+    if CP.carFingerprint == CAR.BYD_SEAL_PERFORMANCE_25:
+      self.steer_msg = "STEERING_TORQUE_ANGLE"
+    else:
+      self.steer_msg = "STEERING_TORQUE"
 
     self.mpc_lkas_cmd_msg = None
     self.eps_steering_torque_msg = None
@@ -45,12 +52,12 @@ class CarState(CarStateBase, MadsCarState):
     # Steering wheel
     ret.steeringAngleDeg = cp.vl["STEER_MODULE"]["STEER_ANGLE"]
     ret.steeringRateDeg = cp.vl["STEER_MODULE"]["STEERING_RATE"]
-    ret.steeringTorque = cp.vl["STEERING_TORQUE"]["Steer_Torque_Sensor"]
-    ret.steeringTorqueEps = cp.vl["STEERING_TORQUE"]["MAIN_TORQUE"]
+    ret.steeringTorque = cp.vl[self.steer_msg]["Steer_Torque_Sensor"]
+    ret.steeringTorqueEps = cp.vl[self.steer_msg]["MAIN_TORQUE"]
     # TODO: looks like STEER_THRESHOLD is too small
     ret.steeringPressed = self.update_steering_pressed(abs(ret.steeringTorque) > STEER_THRESHOLD, 5)
-    ret.steerFaultPermanent = cp.vl["STEERING_TORQUE"]["TORQUE_FAILED"] != 0
-    ret.steerFaultTemporary = cp.vl["STEERING_TORQUE"]["TORQUE_FAILED"] != 0
+    ret.steerFaultPermanent = cp.vl[self.steer_msg]["TORQUE_FAILED"] != 0
+    ret.steerFaultTemporary = cp.vl[self.steer_msg]["TORQUE_FAILED"] != 0
 
     ret.stockAeb = cp_cam.vl["ACC_HUD_ADAS"]["AEB"] == 1
     ret.stockFcw = cp_cam.vl["ACC_HUD_ADAS"]["FCW"] == 1  # Forward Collision Warning
@@ -87,10 +94,10 @@ class CarState(CarStateBase, MadsCarState):
     # Messages needed by carcontroller
     # for generate MPC_LKAS_CMD
     self.mpc_lkas_cmd_msg = copy.copy(cp_cam.vl["MPC_LKAS_CMD"])
-    self.eps_prepared = cp.vl["STEERING_TORQUE"]["LKSPrepare"] != 0
-    self.eps_activated = cp.vl["STEERING_TORQUE"]["Cruise_Activated"] != 0
-    # for generate STEERING_TORQUE
-    self.eps_steering_torque_msg = copy.copy(cp.vl["STEERING_TORQUE"])
+    self.eps_prepared = cp.vl[self.steer_msg]["LKSPrepare"] != 0
+    self.eps_activated = cp.vl[self.steer_msg]["Cruise_Activated"] != 0
+    # for generate steering feedback message
+    self.eps_steering_torque_msg = copy.copy(cp.vl[self.steer_msg])
     self.mpc_lkas_output = cp_cam.vl["MPC_LKAS_CMD"]["LKAS_Output"]
     self.mpc_lkas_active = cp_cam.vl["MPC_LKAS_CMD"]["LKAS_ACTIVE"] != 0
     self.mpc_lkas_request_prepare = cp_cam.vl["MPC_LKAS_CMD"]["LKASPrepare"] != 0
@@ -109,13 +116,21 @@ class CarState(CarStateBase, MadsCarState):
       ("BRAKE_APPLIED", 10),
       ("PEDAL", 10),
       ("STEER_MODULE", 10),
-      ("STEERING_TORQUE", 10),
       ("DRIVE_STATE", 10),
       ("STALKS", float('nan')),
       ("METER_CLUSTER", float('nan')),
       # steering wheel buttons; bus assignment is harness dependent
       ("PCM_BUTTONS", float('nan')),
     ]
+
+    # EPS steering feedback message differs by platform; alive-check only
+    # the one this car has, parse the other opportunistically
+    if CP.carFingerprint == CAR.BYD_SEAL_PERFORMANCE_25:
+      pt_messages.append(("STEERING_TORQUE_ANGLE", 10))
+      pt_messages.append(("STEERING_TORQUE", float('nan')))
+    else:
+      pt_messages.append(("STEERING_TORQUE", 10))
+      pt_messages.append(("STEERING_TORQUE_ANGLE", float('nan')))
 
     cam_messages = [
       ("ACC_HUD_ADAS", 10),

@@ -3,9 +3,12 @@
 // MPC_LKAS_CMD (790), little endian
 #define BYD_GET_LKAS_OUTPUT(msg)  (to_signed((((msg)->data[3] & 0x7U) << 8U) | (msg)->data[2], 11))
 #define BYD_LKAS_ACTIVE_BIT       28U
-// STEERING_TORQUE (792), little endian
+// STEERING_TORQUE (792, HAN), little endian
 #define BYD_GET_MAIN_TORQUE(msg)  (to_signed((((msg)->data[2] & 0xFU) << 8U) | (msg)->data[1], 12))
 #define BYD_GET_DRIVER_TORQUE(msg) (to_signed((((msg)->data[4] & 0xFU) << 8U) | (msg)->data[3], 12))
+// STEERING_TORQUE_ANGLE (508, SEAL), little endian
+#define BYD_GET_MAIN_TORQUE_ANGLE(msg)  (to_signed((((msg)->data[5] & 0xFU) << 8U) | (msg)->data[4], 12))
+#define BYD_GET_DRIVER_TORQUE_ANGLE(msg) (to_signed((((msg)->data[1] & 0xFU) << 4U) | ((msg)->data[0] >> 4U), 12))
 // PCM_BUTTONS (944)
 #define BYD_LKAS_ON_BTN_BIT       14U
 
@@ -73,7 +76,7 @@ static void byd_rx_hook(const CANPacket_t *msg) {
     if (msg->addr == 289U) {
       vehicle_moving = (((msg->data[1] & 0x0FU) << 8U) | msg->data[0]) != 0U;
     }
-    // STEERING_TORQUE: sample EPS output torque and driver torque
+    // STEERING_TORQUE (HAN): sample EPS output torque and driver torque
     if (msg->addr == 792U) {
       int torque_meas_new = BYD_GET_MAIN_TORQUE(msg);
       update_sample(&torque_meas, torque_meas_new);
@@ -81,6 +84,17 @@ static void byd_rx_hook(const CANPacket_t *msg) {
       torque_meas.max++;
 
       int torque_driver_new = BYD_GET_DRIVER_TORQUE(msg);
+      update_sample(&torque_driver, torque_driver_new);
+    }
+    // STEERING_TORQUE_ANGLE (SEAL): same feedback on a different message/layout
+    if (msg->addr == 508U) {
+      int torque_meas_new = BYD_GET_MAIN_TORQUE_ANGLE(msg);
+      update_sample(&torque_meas, torque_meas_new);
+      torque_meas.min--;
+      torque_meas.max++;
+
+      // driver torque factor is 0.1 on this message
+      int torque_driver_new = (BYD_GET_DRIVER_TORQUE_ANGLE(msg) + 5) / 10;
       update_sample(&torque_driver, torque_driver_new);
     }
     // PCM_BUTTONS: dedicated LKAS steering wheel button for MADS
@@ -118,7 +132,8 @@ static safety_config byd_init(uint16_t param) {
     {.msg = {{834, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // PEDAL
     {.msg = {{289, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // ESC
     {.msg = {{287, 0, 5, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // STEER_MODULE
-    {.msg = {{792, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // STEERING_TORQUE
+    {.msg = {{792, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true},              // STEERING_TORQUE (HAN)
+             {508, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }}},   // STEERING_TORQUE_ANGLE (SEAL)
     {.msg = {{944, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // PCM_BUTTONS
     {.msg = {{813, 2, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // ACC_HUD_ADAS
     {.msg = {{307, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // STALKS
