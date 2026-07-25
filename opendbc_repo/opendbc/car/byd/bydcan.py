@@ -138,6 +138,47 @@ class BydCAN:
     values["CHECKSUM"] = byd_checksum(data)
     return self.packer.make_can_msg("STEERING_TORQUE", CANBUS.cam_bus, values)
 
+  # SEAL: spoofed 508 STEERING_TORQUE_ANGLE feedback towards the camera.
+  # Mirrors the camera's own request state back to it so the stock ADAS does
+  # not fault while panda intercepts its LKAS commands (same trick as the
+  # HAN's 792 spoofing, but on the Seal's 508 message layout).
+  def create_steering_torque_angle(self, eps_steering_torque_msg, mpc_lkas_output,
+                                   mpc_lkas_request_prepare, mpc_lkas_active,
+                                   mpc_lkas_angle_output):
+    lks_prepared = eps_steering_torque_msg["LKSPrepare"]
+    cruise_activated = eps_steering_torque_msg["Cruise_Activated"]
+    main_torque = eps_steering_torque_msg["MAIN_TORQUE"]
+    target_angle = eps_steering_torque_msg["TARGET_ANGLE"]
+
+    if mpc_lkas_active:
+      lks_prepared = 0
+      cruise_activated = 1
+      main_torque = mpc_lkas_output
+      target_angle = mpc_lkas_angle_output
+    elif mpc_lkas_request_prepare:
+      lks_prepared = 1
+      cruise_activated = 0
+      main_torque = 0
+    else:
+      lks_prepared = 0
+      cruise_activated = 0
+      main_torque = 0
+
+    values = {
+      "LKSPrepare": lks_prepared,
+      "Cruise_Activated": cruise_activated,
+      "TORQUE_FAILED": eps_steering_torque_msg["TORQUE_FAILED"],
+      "Steer_Torque_Sensor": eps_steering_torque_msg["Steer_Torque_Sensor"],
+      "TARGET_ANGLE": target_angle,
+      "MAIN_TORQUE": main_torque,
+      "Keep_Hands_On_Wheel": 0,
+      "TORQUE_TEMP_FAILED": eps_steering_torque_msg["TORQUE_TEMP_FAILED"],
+      "COUNTER": self._generate_eps_steering_torque_new_counter(),
+    }
+    data = self.packer.make_can_msg("STEERING_TORQUE_ANGLE", CANBUS.cam_bus, values)[1]
+    values["CHECKSUM"] = byd_checksum(data)
+    return self.packer.make_can_msg("STEERING_TORQUE_ANGLE", CANBUS.cam_bus, values)
+
   def create_acc_cmd(self, acc_cmd_msg, accel):
     values = {
       "ACCEL_CMD": accel,

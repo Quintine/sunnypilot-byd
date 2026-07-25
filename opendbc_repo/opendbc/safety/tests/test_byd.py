@@ -7,8 +7,9 @@ import opendbc.safety.tests.common as common
 from opendbc.safety.tests.common import CANPackerSafety
 
 MSG_MPC_LKAS_CMD = 790       # TX by OP, lateral actuation towards EPS
-MSG_STEERING_TORQUE = 792    # RX from EPS / TX by OP, torque feedback towards camera
-MSG_ACC_HUD_ADAS = 813       # RX from camera, ACC state
+MSG_STEERING_TORQUE = 792    # RX from EPS / TX by OP, torque feedback towards camera (HAN)
+MSG_STEERING_TORQUE_ANGLE = 508  # RX from EPS / TX by OP, torque feedback towards camera (SEAL)
+MSG_ACC_HUD_ADAS = 813       # RX from ADAS, ACC state
 MSG_ACC_CMD = 814            # TX by OP, longitudinal actuation
 MSG_PCM_BUTTONS = 944        # RX from PCM, steering wheel buttons
 
@@ -36,10 +37,10 @@ def byd_checksum(msg):
 
 
 class TestBydSafetyBase(common.CarSafetyTest, common.MotorTorqueSteeringSafetyTest):
-  TX_MSGS = [[MSG_MPC_LKAS_CMD, 0], [MSG_STEERING_TORQUE, 2]]
+  TX_MSGS = [[MSG_MPC_LKAS_CMD, 0], [MSG_STEERING_TORQUE, 2], [MSG_STEERING_TORQUE_ANGLE, 2]]
   STANDSTILL_THRESHOLD = 0
-  RELAY_MALFUNCTION_ADDRS = {0: (MSG_MPC_LKAS_CMD,), 2: (MSG_STEERING_TORQUE,)}
-  FWD_BLACKLISTED_ADDRS = {0: [MSG_STEERING_TORQUE], 2: [MSG_MPC_LKAS_CMD]}
+  RELAY_MALFUNCTION_ADDRS = {0: (MSG_MPC_LKAS_CMD,), 2: (MSG_STEERING_TORQUE, MSG_STEERING_TORQUE_ANGLE)}
+  FWD_BLACKLISTED_ADDRS = {0: [MSG_STEERING_TORQUE, MSG_STEERING_TORQUE_ANGLE], 2: [MSG_MPC_LKAS_CMD]}
 
   MAX_TORQUE_LOOKUP = ([0], [300])
   MAX_RATE_UP = 6
@@ -98,9 +99,9 @@ class TestBydStockSafety(TestBydSafetyBase):
 
 
 class TestBydLongitudinalSafety(TestBydSafetyBase):
-  TX_MSGS = [[MSG_MPC_LKAS_CMD, 0], [MSG_STEERING_TORQUE, 2], [MSG_ACC_CMD, 0]]
-  RELAY_MALFUNCTION_ADDRS = {0: (MSG_MPC_LKAS_CMD, MSG_ACC_CMD), 2: (MSG_STEERING_TORQUE,)}
-  FWD_BLACKLISTED_ADDRS = {0: [MSG_STEERING_TORQUE], 2: [MSG_MPC_LKAS_CMD, MSG_ACC_CMD]}
+  TX_MSGS = [[MSG_MPC_LKAS_CMD, 0], [MSG_STEERING_TORQUE, 2], [MSG_STEERING_TORQUE_ANGLE, 2], [MSG_ACC_CMD, 0]]
+  RELAY_MALFUNCTION_ADDRS = {0: (MSG_MPC_LKAS_CMD, MSG_ACC_CMD), 2: (MSG_STEERING_TORQUE, MSG_STEERING_TORQUE_ANGLE)}
+  FWD_BLACKLISTED_ADDRS = {0: [MSG_STEERING_TORQUE, MSG_STEERING_TORQUE_ANGLE], 2: [MSG_MPC_LKAS_CMD, MSG_ACC_CMD]}
 
   MIN_ACCEL = 20    # -4.0 m/s^2, raw = (m/s^2 + 5) / 0.05
   MAX_ACCEL = 140   # 2.0 m/s^2

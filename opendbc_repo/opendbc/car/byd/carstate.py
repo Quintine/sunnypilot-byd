@@ -35,6 +35,7 @@ class CarState(CarStateBase, MadsCarState):
     self.mpc_lkas_output = 0
     self.mpc_lkas_active = False
     self.mpc_lkas_request_prepare = False
+    self.mpc_lkas_angle_output = 0.0
 
   def update(self, can_parsers) -> tuple[structs.CarState, structs.CarStateSP]:
     cp = can_parsers[Bus.pt]
@@ -106,6 +107,8 @@ class CarState(CarStateBase, MadsCarState):
     self.mpc_lkas_output = cp_cam.vl["MPC_LKAS_CMD"]["LKAS_Output"]
     self.mpc_lkas_active = cp_cam.vl["MPC_LKAS_CMD"]["LKAS_ACTIVE"] != 0
     self.mpc_lkas_request_prepare = cp_cam.vl["MPC_LKAS_CMD"]["LKASPrepare"] != 0
+    # camera's angle-based LKAS request (SEAL), used to spoof the 508 TARGET_ANGLE echo
+    self.mpc_lkas_angle_output = cp_cam.vl["MPC_LKAS_CMD_ANGLE"]["LKAS_Output"]
     # for generate ACC_CMD
     self.acc_cmd_msg = copy.copy(cp_adas.vl["ACC_CMD"])
     return ret, ret_sp

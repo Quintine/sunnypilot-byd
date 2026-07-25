@@ -42,11 +42,18 @@ static bool byd_tx_hook(const CANPacket_t *msg) {
     }
   }
 
-  // STEERING_TORQUE: feedback message towards the camera, torque echoes the
-  // camera's own request. Only sanity-check the absolute limit so stock LKAS
-  // requests don't fault when openpilot is inactive.
+  // STEERING_TORQUE (792, HAN) / STEERING_TORQUE_ANGLE (508, SEAL):
+  // feedback message towards the camera, torque echoes the camera's own
+  // request. Only sanity-check the absolute limit so stock LKAS requests
+  // don't fault when openpilot is inactive.
   if (msg->addr == 792U) {
     int main_torque = BYD_GET_MAIN_TORQUE(msg);
+    if (safety_max_limit_check(main_torque, BYD_STEERING_LIMITS.max_torque, -BYD_STEERING_LIMITS.max_torque)) {
+      tx = false;
+    }
+  }
+  if (msg->addr == 508U) {
+    int main_torque = BYD_GET_MAIN_TORQUE_ANGLE(msg);
     if (safety_max_limit_check(main_torque, BYD_STEERING_LIMITS.max_torque, -BYD_STEERING_LIMITS.max_torque)) {
       tx = false;
     }
@@ -115,12 +122,14 @@ static void byd_rx_hook(const CANPacket_t *msg) {
 static safety_config byd_init(uint16_t param) {
   static const CanMsg BYD_TX_MSGS[] = {
     {790, 0, 8, .check_relay = true}, // MPC_LKAS_CMD
-    {792, 2, 8, .check_relay = true}, // STEERING_TORQUE
+    {792, 2, 8, .check_relay = true}, // STEERING_TORQUE (HAN)
+    {508, 2, 8, .check_relay = true}, // STEERING_TORQUE_ANGLE (SEAL)
   };
 
   static const CanMsg BYD_TX_LONG_MSGS[] = {
     {790, 0, 8, .check_relay = true}, // MPC_LKAS_CMD
-    {792, 2, 8, .check_relay = true}, // STEERING_TORQUE
+    {792, 2, 8, .check_relay = true}, // STEERING_TORQUE (HAN)
+    {508, 2, 8, .check_relay = true}, // STEERING_TORQUE_ANGLE (SEAL)
     {814, 0, 8, .check_relay = true}, // ACC_CMD
   };
 

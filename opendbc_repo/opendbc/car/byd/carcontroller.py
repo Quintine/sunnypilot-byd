@@ -30,10 +30,10 @@ class CarController(CarControllerBase):
 
     self.apply_accel_last = 0
 
-    # EPS steering feedback forwarding (792 STEERING_TORQUE) only applies to
-    # platforms whose EPS reports on 792 (HAN). The SEAL EPS reports on
-    # 508 STEERING_TORQUE_ANGLE which is forwarded stock for now.
-    self.send_steering_feedback = CP.carFingerprint != CAR.BYD_SEAL_PERFORMANCE_25
+    # EPS steering feedback is spoofed towards the camera on both platforms so
+    # the stock ADAS does not fault while its LKAS commands are intercepted:
+    # HAN uses 792 STEERING_TORQUE, SEAL uses 508 STEERING_TORQUE_ANGLE.
+    self.seal_platform = CP.carFingerprint == CAR.BYD_SEAL_PERFORMANCE_25
 
   def update(self, CC, CC_SP, CS, now_nanos):
     # car control running in 100Hz
@@ -80,12 +80,18 @@ class CarController(CarControllerBase):
                                                      lkas_request_prepare, lkas_active,
                                                      lkas_mode, CS.eps_activated)
       can_sends.append(pack)
-      if self.send_steering_feedback:
+      if self.seal_platform:
+        pack = self.can.create_steering_torque_angle(CS.eps_steering_torque_msg,
+                                                     CS.mpc_lkas_output,
+                                                     CS.mpc_lkas_request_prepare,
+                                                     CS.mpc_lkas_active,
+                                                     CS.mpc_lkas_angle_output)
+      else:
         pack = self.can.create_steering_torque(CS.eps_steering_torque_msg,
                                                CS.mpc_lkas_output,
                                                CS.mpc_lkas_request_prepare,
                                                CS.mpc_lkas_active)
-        can_sends.append(pack)
+      can_sends.append(pack)
 
       self.apply_torque_last = apply_torque
 
