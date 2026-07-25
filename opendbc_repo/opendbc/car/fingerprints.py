@@ -1,5 +1,6 @@
 from opendbc.car.interfaces import get_interface_attr
 from opendbc.car.body.values import CAR as BODY
+from opendbc.car.byd.values import CAR as BYD
 from opendbc.car.chrysler.values import CAR as CHRYSLER
 from opendbc.car.ford.values import CAR as FORD
 from opendbc.car.gm.values import CAR as GM
@@ -56,6 +57,8 @@ def all_legacy_fingerprint_cars():
 
 # A dict that maps old platform strings to their latest representations
 MIGRATION = {
+  "BYD HAN EV 23": BYD.BYD_HAN_EV_23,
+  "BYD SEAL PERFORMANCE 2025": BYD.BYD_SEAL_PERFORMANCE_25,
   "ACURA ILX 2016 ACURAWATCH PLUS": HONDA.ACURA_ILX,
   "ACURA RDX 2018 ACURAWATCH PLUS": HONDA.ACURA_RDX,
   "ACURA RDX 2020 TECH": HONDA.ACURA_RDX_3G,

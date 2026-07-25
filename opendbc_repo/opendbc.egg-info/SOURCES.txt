@@ -57,6 +57,13 @@ opendbc/car/body/carstate.py
 opendbc/car/body/fingerprints.py
 opendbc/car/body/interface.py
 opendbc/car/body/values.py
+opendbc/car/byd/__init__.py
+opendbc/car/byd/bydcan.py
+opendbc/car/byd/carcontroller.py
+opendbc/car/byd/carstate.py
+opendbc/car/byd/fingerprints.py
+opendbc/car/byd/interface.py
+opendbc/car/byd/values.py
 opendbc/car/chrysler/__init__.py
 opendbc/car/chrysler/carcontroller.py
 opendbc/car/chrysler/carstate.py
@@ -214,6 +221,7 @@ opendbc/dbc/FORD_CADS_64.dbc
 opendbc/dbc/__init__.py
 opendbc/dbc/acura_ilx_2016_nidec.dbc
 opendbc/dbc/bmw_e9x_e8x.dbc
+opendbc/dbc/byd_common.dbc
 opendbc/dbc/cadillac_ct6_chassis.dbc
 opendbc/dbc/cadillac_ct6_object.dbc
 opendbc/dbc/cadillac_ct6_powertrain.dbc
@@ -345,6 +353,7 @@ opendbc/safety/lateral.h
 opendbc/safety/longitudinal.h
 opendbc/safety/safety.h
 opendbc/safety/modes/body.h
+opendbc/safety/modes/byd.h
 opendbc/safety/modes/chrysler.h
 opendbc/safety/modes/chrysler_common.h
 opendbc/safety/modes/chrysler_cusw.h
@@ -416,6 +425,8 @@ opendbc/sunnypilot/car/intelligent_cruise_button_management_interface_base.py
 opendbc/sunnypilot/car/interfaces.py
 opendbc/sunnypilot/car/lateral_ext.py
 opendbc/sunnypilot/car/platform_list.py
+opendbc/sunnypilot/car/byd/__init__.py
+opendbc/sunnypilot/car/byd/mads.py
 opendbc/sunnypilot/car/chrysler/__init__.py
 opendbc/sunnypilot/car/chrysler/carcontroller_ext.py
 opendbc/sunnypilot/car/chrysler/carstate_ext.py

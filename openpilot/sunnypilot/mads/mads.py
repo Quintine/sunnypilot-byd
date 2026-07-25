@@ -47,6 +47,9 @@ class ModularAssistiveDrivingSystem:
         self.allow_always = True
     if self.CP.brand == "tesla":
       self.allow_always = True
+    if self.CP.brand == "byd":
+      # BYD has a dedicated LKAS steering wheel button
+      self.allow_always = True
 
     if self.CP.brand in MADS_NO_ACC_MAIN_BUTTON:
       self.no_main_cruise = True

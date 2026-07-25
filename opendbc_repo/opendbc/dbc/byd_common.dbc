@@ -1,0 +1,375 @@
+VERSION ""
+
+
+NS_ :
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: XXX
+
+BO_ 85 EPB: 8 XXX
+ SG_ EPB_ACTIVE : 40|1@1+ (1,0) [0|1] "" XXX
+
+BO_ 234 STEERING_TORQUE_ALT: 8 XXX
+ SG_ LKSPrepare : 0|1@1+ (1,0) [0|1] "" XXX
+ SG_ Cruise_Activated : 1|1@1+ (1,0) [0|1] "" XXX
+ SG_ TORQUE_FAILED : 4|1@1+ (1,0) [0|1] "" XXX
+ SG_ Steer_Torque_Sensor : 8|12@1- (1,0) [0|4095] "" XXX
+ SG_ MAIN_TORQUE : 24|12@1+ (0.15,-316) [0|4095] "" XXX
+ SG_ WAIT_INIT : 36|1@1+ (1,0) [0|1] "" XXX
+ SG_ COUNTER : 52|4@1+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 235 MPC_LKAS_CMD_ALT: 8 XXX
+ SG_ TORQUE_FACTOR : 0|8@1+ (1,0) [0|255] "" XXX
+ SG_ LKAS_Output : 8|12@1- (0.15,0) [0|4095] "" XXX
+ SG_ LKASPrepare : 20|1@1+ (1,0) [0|1] "" XXX
+ SG_ LKAS_ACTIVE : 21|1@1+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_2 : 22|2@1+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_FF_1 : 24|8@1+ (1,0) [0|255] "" XXX
+ SG_ SET_ME_FF_2 : 32|8@1+ (1,0) [0|255] "" XXX
+ SG_ SET_ME_FF_3 : 40|8@1+ (1,0) [0|255] "" XXX
+ SG_ SET_ME_F : 48|4@1+ (1,0) [0|15] "" XXX
+ SG_ COUNTER : 52|4@1+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 269 ECM: 8 XXX
+ SG_ ENG_RPM : 0|16@1+ (0.25,0) [0|255] "" XXX
+ SG_ GAS_PEDAL : 40|8@1+ (0.00392,0) [0|255] "" XXX
+
+BO_ 287 STEER_MODULE: 5 XXX
+ SG_ STEER_ANGLE : 0|16@1- (0.1,0) [-450|450] "" XXX
+ SG_ STEERING_RATE : 16|8@1+ (4,0) [0|1020] "" XXX
+ SG_ PAYLOAD : 24|8@1+ (1,0) [0|255] "" XXX
+ SG_ COUNTER : 32|4@1+ (1,0) [0|255] "" XXX
+ SG_ CHECKSUM_S : 36|4@1+ (1,0) [0|15] "" XXX
+
+BO_ 289 ESC: 8 XXX
+ SG_ VEHICLE_SPEED : 0|12@1+ (0.0725,0) [0|4095] "" XXX
+
+BO_ 291 IPB: 8 XXX
+ SG_ BRAKE_PRESSED : 43|1@0+ (1,0) [0|1] "" XXX
+
+BO_ 301 BRAKE_PRESSED: 8 XXX
+ SG_ BRAKE_PRESSED : 8|1@1+ (1,0) [0|1] "" XXX
+
+BO_ 307 STALKS: 8 XXX
+ SG_ EPB_ACTIVE : 1|1@1+ (1,0) [0|1] "" XXX
+ SG_ HEADLIGHT : 2|1@1+ (1,0) [0|1] "" XXX
+ SG_ HIGH_BEAM : 3|1@1+ (1,0) [0|1] "" XXX
+ SG_ LEFT_BLINKER : 4|1@0+ (1,0) [0|1] "" XXX
+ SG_ RIGHT_BLINKER : 5|1@0+ (1,0) [0|1] "" XXX
+ SG_ TURN_SIGNAL_SWITCH : 36|3@1+ (1,0) [0|7] "" XXX
+ SG_ AUTO_HEADLIGHT : 40|1@0+ (1,0) [0|1] "" XXX
+
+BO_ 455 STEER_ANGLE_ALT: 8 XXX
+ SG_ STEER_ANGLE : 0|16@1- (0.1,0) [0|4095] "" XXX
+ SG_ STEER_RATE : 16|8@1+ (4,0) [0|255] "" XXX
+
+BO_ 482 MPC_LKAS_CMD_ANGLE: 8 XXX
+ SG_ JerkUpperLimit : 0|10@1- (1,0) [0|65535] "" XXX
+ SG_ JerkLowerLimit : 10|10@1- (1,0) [0|15] "" XXX
+ SG_ LKASPrepare : 20|1@0+ (1,0) [0|1] "" XXX
+ SG_ LKAS_ACTIVE : 21|1@0+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_3 : 22|2@1+ (1,0) [0|1] "" XXX
+ SG_ LKAS_Output : 24|16@1- (0.1,0) [0|255] "" XXX
+ SG_ SET_ME_FF : 47|8@0+ (1,0) [0|255] "" XXX
+ SG_ SET_ME_F : 48|4@1+ (1,0) [0|15] "" XXX
+ SG_ COUNTER : 52|4@1+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 496 WHEEL_SPEED: 8 XXX
+ SG_ WHEELSPEED_FL : 0|12@1+ (0.0725,0) [0|281.4625] "km/h" XXX
+ SG_ FAULT_FR : 12|1@1+ (1,0) [0|1] "" XXX
+ SG_ FAULT_FL : 13|1@1+ (1,0) [0|1] "" XXX
+ SG_ FAULT_BR : 14|1@1+ (1,0) [0|1] "" XXX
+ SG_ FAULT_BL : 15|1@1+ (1,0) [0|1] "" XXX
+ SG_ WHEELSPEED_FR : 16|12@1+ (0.0725,0) [0|281.4625] "km/h" XXX
+ SG_ WHEELSPEED_BL : 28|12@1+ (0.0725,0) [0|281.4625] "km/h" XXX
+ SG_ WHEELSPEED_BR : 40|12@1+ (0.0725,0) [0|281.4625] "km/h" XXX
+ SG_ COUNTER : 52|4@1+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 508 STEERING_TORQUE_ANGLE: 8 XXX
+ SG_ LKSPrepare : 0|1@1+ (1,0) [0|1] "" XXX
+ SG_ Cruise_Activated : 1|1@1+ (1,0) [0|1] "" XXX
+ SG_ TORQUE_FAILED : 2|1@1+ (1,0) [0|1] "" XXX
+ SG_ Steer_Torque_Sensor : 4|12@1- (0.1,0) [0|65535] "" XXX
+ SG_ TARGET_ANGLE : 16|16@1- (0.1,0) [0|255] "" XXX
+ SG_ MAIN_TORQUE : 32|12@1- (1,0) [0|63] "" XXX
+ SG_ Keep_Hands_On_Wheel : 45|1@1+ (1,0) [0|255] "" XXX
+ SG_ TORQUE_TEMP_FAILED : 46|2@1+ (1,0) [0|3] "" XXX
+ SG_ COUNTER : 52|4@1+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 522 ENGINE_RPM: 8 XXX
+ SG_ ENG_RPM : 31|8@0+ (1,0) [0|255] "" XXX
+
+BO_ 523 ENGINE_GAUGE: 8 XXX
+ SG_ ENG_RPM : 15|8@0+ (12,0) [0|0] "" XXX
+
+BO_ 530 TCU: 8 XXX
+ SG_ GEAR : 48|4@1+ (1,0) [0|15] "" XXX
+
+BO_ 536 EPB_NG: 8 XXX
+ SG_ EPB_ACTIVE : 0|2@1+ (1,0) [0|3] "" XXX
+ SG_ EPB_STATUS : 9|3@1+ (1,0) [0|7] "" XXX
+ SG_ COUNTER : 48|4@1+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 544 BRAKE_APPLIED: 8 XXX
+ SG_ BRAKE_HOLD_ACTIVE : 8|1@0+ (1,0) [0|1] "" XXX
+ SG_ BRAKE_APPLIED_ACTIVE_LOW : 12|1@0+ (1,0) [0|1] "" XXX
+ SG_ STANDSTILL : 19|2@0+ (1,0) [0|3] "" XXX
+ SG_ VLC_SENSOR : 24|8@1+ (0.05,-7) [0|255] "" XXX
+ SG_ NEW_SIGNAL_2 : 32|13@1+ (1,0) [0|8191] "" XXX
+
+BO_ 546 YAW_SENSOR: 8 XXX
+ SG_ YAW_RATE : 0|12@1+ (0.002132603,-2.094216146) [0|4095] "" XXX
+ SG_ YAW_OFFSET : 12|12@1+ (0.002132603,-0.130088783) [0|4095] "" XXX
+
+BO_ 547 ACCEL_SENSOR: 8 XXX
+ SG_ LONGITUDE : 0|12@1- (0.027126736,-21.592881856) [-2848|1247] "" XXX
+ SG_ LONGITUDE_OFFSET : 12|12@1+ (0.027126736,-21.592881856) [0|4095] "" XXX
+ SG_ LATERAL : 24|12@1- (0.027126736,-21.592881856) [-2848|1247] "" XXX
+ SG_ LATERAL_OFFSET : 36|12@1+ (0.027126736,-21.592881856) [0|4095] "" XXX
+
+BO_ 578 DRIVE_STATE: 8 XXX
+ SG_ WHEELSPEED_HR : 0|16@1+ (0.01706666666,-512) [0|65535] "" XXX
+ SG_ RAW_THROTTLE : 30|7@0+ (1,0) [0|127] "" XXX
+ SG_ BRAKE_PRESSED : 37|1@0+ (1,0) [0|1] "" XXX
+ SG_ GEAR : 40|3@1+ (1,0) [0|7] "" XXX
+
+BO_ 660 METER_CLUSTER: 8 XXX
+ SG_ FRONT_RIGHT_DOOR : 1|1@1+ (1,0) [0|511] "" XXX
+ SG_ FRONT_LEFT_DOOR : 3|1@0+ (1,0) [0|1] "" XXX
+ SG_ BACK_LEFT_DOOR : 5|1@1+ (1,0) [0|511] "" XXX
+ SG_ BACK_RIGHT_DOOR : 7|1@0+ (1,0) [0|1] "" XXX
+ SG_ SEATBELT_DRIVER : 17|1@0+ (1,0) [0|1] "" XXX
+ SG_ BRAKE_PRESSED_ALT : 26|1@1+ (1,0) [0|1] "" XXX
+ SG_ COUNTER : 48|4@1+ (1,0) [0|255] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 665 IKEY: 3 XXX
+ SG_ IKEY_REVERT : 20|1@1+ (1,0) [0|1] "" XXX
+ SG_ IKEY_MOVE_OR_STEERING : 21|1@1+ (1,0) [0|1] "" XXX
+ SG_ IKEY_ENABLE : 22|1@1+ (1,0) [0|1] "" XXX
+
+BO_ 790 MPC_LKAS_CMD: 8 XXX
+ SG_ SETME_0x1 : 0|4@1+ (1,0) [0|3] "" XXX
+ SG_ LeftLane : 4|2@1+ (1,0) [0|3] "" XXX
+ SG_ Config : 6|2@1+ (1,0) [0|3] "" XXX
+ SG_ SETME2_0x1 : 8|2@1+ (1,0) [0|3] "" XXX
+ SG_ Keep_Hands_On_Wheel : 10|1@1+ (1,0) [0|1] "" XXX
+ SG_ MPCErr : 11|4@1+ (1,0) [0|1] "" XXX
+ SG_ SETME3_0x1 : 15|1@0+ (1,0) [0|1] "" XXX
+ SG_ LKAS_Output : 16|11@1- (1,0) [-1024|1023] "" XXX
+ SG_ LKASPrepare : 27|1@1+ (1,0) [0|1] "" XXX
+ SG_ LKAS_ACTIVE : 28|1@1+ (1,0) [0|3] "" XXX
+ SG_ TSRStatus : 29|3@1+ (1,0) [0|1] "" XXX
+ SG_ SETME4_0x1 : 32|2@1+ (1,0) [0|3] "" XXX
+ SG_ RightLane : 34|2@1+ (1,0) [0|3] "" XXX
+ SG_ LKAS_Mode : 36|3@1+ (1,0) [0|3] "" XXX
+ SG_ SETME_0x0 : 39|1@1+ (1,0) [0|3] "" XXX
+ SG_ TSRResult : 40|8@1+ (5,-5) [-5|1270] "" XXX
+ SG_ Unknow1 : 48|4@1+ (1,0) [0|15] "" XXX
+ SG_ COUNTER : 52|4@1+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 792 STEERING_TORQUE: 8 XXX
+ SG_ LKSPrepare : 0|1@1+ (1,0) [0|1] "" XXX
+ SG_ Cruise_Activated : 1|1@1+ (1,0) [0|1] "" XXX
+ SG_ TORQUE_FAILED : 2|1@1+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_1_1 : 3|1@1+ (1,0) [0|1] "" XXX
+ SG_ Steer_Warning : 4|1@1+ (1,0) [0|1] "" XXX
+ SG_ Steer_Error_1 : 5|1@1+ (1,0) [0|1] "" XXX
+ SG_ Steer_Error_2 : 6|1@1+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_1 : 7|1@1+ (1,0) [0|1] "" XXX
+ SG_ MAIN_TORQUE : 8|12@1- (1,0) [-2048|2047] "" XXX
+ SG_ SET_ME_1_2 : 20|1@1+ (1,0) [0|1] "" XXX
+ SG_ Keep_Hands_On_Wheel : 21|1@1+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_3 : 22|2@1+ (1,0) [0|15] "" XXX
+ SG_ Steer_Torque_Sensor : 24|12@1- (1,0) [-2048|2047] "" XXX
+ SG_ SET_ME_XF_1 : 36|4@1+ (1,0) [0|15] "" XXX
+ SG_ SET_ME_XFFF : 40|12@1+ (1,0) [0|4095] "" XXX
+ SG_ COUNTER : 52|4@1+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 801 BRAKE_PEDAL_LEG: 8 XXX
+ SG_ BRAKE_PEDAL : 0|12@1+ (0.001,-0.278) [0|255] "" XXX
+ SG_ COUNTER : 52|4@1+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 813 ACC_HUD_ADAS: 8 XXX
+ SG_ SET_SPEED : 0|9@1+ (0.5,0) [0|255.5] "" XXX
+ SG_ HAS_LEAD : 9|1@1+ (1,0) [0|1] "" XXX
+ SG_ SET_DISTANCE : 10|3@1+ (1,0) [0|7] "" XXX
+ SG_ LEAD_DISTANCE : 13|3@1+ (1,0) [0|7] "" XXX
+ SG_ AEB : 16|1@1+ (1,0) [0|1] "" XXX
+ SG_ FCW : 17|1@1+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_1 : 18|1@1+ (1,0) [0|1] "" XXX
+ SG_ ACC_ON2 : 19|1@0+ (1,0) [0|1] "" XXX
+ SG_ ACC_CONTROLLABLE_AND_ON : 20|1@1+ (1,0) [0|1] "" XXX
+ SG_ OVERRIDE : 21|1@1+ (1,0) [0|1] "" XXX
+ SG_ ACC_ON1 : 22|1@0+ (1,0) [0|1] "" XXX
+ SG_ TOO_CLOSE : 23|1@0+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_1_1 : 24|3@1+ (1,0) [0|1] "" XXX
+ SG_ NOTIFY : 27|5@1+ (1,0) [0|127] "" XXX
+ SG_ ERROR : 32|4@1+ (1,0) [0|15] "" XXX
+ SG_ SET_ME_XFF : 36|8@1+ (1,0) [0|4095] "" XXX
+ SG_ CRUISE_STATE : 44|4@1+ (1,0) [0|15] "" XXX
+ SG_ COUNTER : 48|4@1+ (1,0) [0|15] "" XXX
+ SG_ SET_ME_XF : 55|4@0+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 814 ACC_CMD: 8 XXX
+ SG_ ACCEL_CMD : 0|8@1+ (0.05,-5) [-100|155] "m/s^2" XXX
+ SG_ ComfortBandUpper : 8|8@1+ (0.05,-5) [0|1.26] "m/s^2" XXX
+ SG_ ComfortBandLower : 16|8@1+ (0.05,-5) [0|1.26] "m/s^2" XXX
+ SG_ JerkUpperLimit : 24|7@1+ (0.2,0) [0|12.7] "m/s^3" XXX
+ SG_ SET_ME_1 : 31|1@0+ (1,0) [0|3] "" XXX
+ SG_ JerkLowerLimit : 32|7@1+ (0.2,-16) [0|12.7] "m/s^3" XXX
+ SG_ STANDSTILL_RESUME : 39|1@0+ (1,0) [0|1] "" XXX
+ SG_ STANDSTILL_STATE : 40|1@0+ (1,0) [0|1] "" XXX
+ SG_ BRAKE_BEHAVIOR : 41|2@1+ (1,0) [0|3] "" XXX
+ SG_ ACC_REQ_NOT_STANDSTILL : 43|1@1+ (1,0) [0|1] "" XXX
+ SG_ ACC_CONTROLLABLE_AND_ON : 44|1@0+ (1,0) [0|1] "" XXX
+ SG_ ACC_OVERRIDE_OR_STANDSTILL : 45|1@0+ (1,0) [0|1] "" XXX
+ SG_ ESP_BEHAVIOR : 46|2@1+ (1,0) [0|3] "" XXX
+ SG_ COUNTER : 48|4@1+ (1,0) [0|15] "" XXX
+ SG_ SET_ME_XF : 55|4@0+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 815 ACC_AEB: 8 XXX
+ SG_ PAYLOAD : 0|48@1+ (1,0) [0|4.5035996273705e+15] "" XXX
+ SG_ COUNTER : 48|4@1+ (1,0) [0|15] "" XXX
+ SG_ SETME_0xF : 55|4@0+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 834 PEDAL: 8 XXX
+ SG_ GAS_PEDAL : 0|8@1+ (0.01,0) [0|2.55] "" XXX
+ SG_ BRAKE_PEDAL : 8|8@1+ (0.01,0) [0|2.55] "" XXX
+ SG_ STILL_GENERATOR : 19|1@1+ (1,0) [0|1] "" XXX
+ SG_ DRIVE_MODE : 20|2@1+ (1,0) [0|255] "" XXX
+ SG_ POWER_MODE : 28|2@1+ (1,0) [0|1] "" XXX
+
+BO_ 848 RADAR_UNUSED_0: 8 XXX
+
+BO_ 849 RADAR_TRACK_1: 8 XXX
+ SG_ LONG_DIST : 16|12@1- (0.06,-4) [-61.44|61.41] "m" XXX
+ SG_ LAT_DIST : 28|10@1+ (0.05,-25.6) [-15.36|15.33] "m" XXX
+ SG_ TRACK_ID : 38|6@1+ (1,0) [0|63] "" XXX
+ SG_ REL_SPEED : 44|10@1+ (1,-512) [-512|511] "km/s" XXX
+ SG_ SETME_0x3 : 54|2@1+ (1,0) [0|3] "" XXX
+ SG_ VALID : 56|1@0+ (1,0) [0|1] "" XXX
+ SG_ SETME_0x0 : 57|7@1+ (1,0) [0|127] "" XXX
+
+BO_ 850 RADAR_TRACK_2: 8 XXX
+ SG_ LONG_DIST : 16|12@1- (0.06,-4) [-61.44|61.41] "m" XXX
+ SG_ LAT_DIST : 28|10@1+ (-0.05,-25.6) [-15.36|15.33] "m" XXX
+ SG_ TRACK_ID : 38|6@1+ (1,0) [0|63] "" XXX
+ SG_ REL_SPEED : 44|10@1+ (1,-512) [-512|511] "km/s" XXX
+ SG_ SETME_0x3 : 54|2@1+ (1,0) [0|3] "" XXX
+ SG_ VALID : 56|1@0+ (1,0) [0|1] "" XXX
+ SG_ SETME_0x0 : 57|7@1+ (1,0) [0|127] "" XXX
+
+BO_ 851 RADAR_TRACK_3: 8 XXX
+ SG_ LONG_DIST : 16|12@1- (0.06,-4) [-61.44|61.41] "m" XXX
+ SG_ LAT_DIST : 28|10@1+ (0.05,-25.6) [-15.36|15.33] "m" XXX
+ SG_ TRACK_ID : 38|6@1+ (1,0) [0|63] "" XXX
+ SG_ REL_SPEED : 44|10@1+ (1,-512) [-512|511] "km/s" XXX
+ SG_ SETME_0x3 : 54|2@1+ (1,0) [0|3] "" XXX
+ SG_ VALID : 56|1@0+ (1,0) [0|1] "" XXX
+ SG_ SETME_0x0 : 57|7@1+ (1,0) [0|127] "" XXX
+
+BO_ 852 RADAR_TRACK_4: 8 XXX
+ SG_ LONG_DIST : 16|12@1- (0.06,-4) [-61.44|61.41] "m" XXX
+ SG_ LAT_DIST : 28|10@1+ (0.05,-25.6) [-15.36|15.33] "m" XXX
+ SG_ TRACK_ID : 38|6@1+ (1,0) [0|63] "" XXX
+ SG_ REL_SPEED : 44|10@1+ (1,-512) [-512|511] "km/s" XXX
+ SG_ SETME_0x3 : 54|2@1+ (1,0) [0|3] "" XXX
+ SG_ VALID : 56|1@0+ (1,0) [0|1] "" XXX
+ SG_ SETME_0x0 : 57|7@1+ (1,0) [0|127] "" XXX
+
+BO_ 884 RADAR_TRACK_COMBINE: 8 XXX
+ SG_ TRACK_ID : 0|3@1+ (1,0) [0|7] "bit" XXX
+ SG_ TargetType : 4|4@1+ (1,0) [0|8] "bit" XXX
+ SG_ LAT_DIST : 8|8@1+ (0.1,-12) [-100|100] "bit" XXX
+ SG_ LONG_DIST : 16|8@1+ (1,-100) [-100|100] "bit" XXX
+ SG_ REL_SPEED : 24|8@1+ (1,0) [0|254] "km/h" XXX
+ SG_ REL_SPEED_H : 32|8@1+ (1,0) [0|254] "km/h" XXX
+ SG_ VALID : 40|2@1+ (1,0) [0|3] "bit" XXX
+ SG_ COUNTER : 52|4@1+ (1,0) [0|15] "bit" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "bit" XXX
+
+BO_ 926 GAUGE_SPEED: 8 XXX
+ SG_ GAUGE_SPEED : 8|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 944 PCM_BUTTONS: 8 XXX
+ SG_ DISTANCE_BTN : 0|3@1+ (1,0) [0|7] "" XXX
+ SG_ BTN_ACC_DEC : 3|3@1+ (1,0) [0|7] "" XXX
+ SG_ SET_BTN : 6|1@0+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_0_1 : 7|1@1+ (1,0) [0|1] "" XXX
+ SG_ ACC_ON_BTN : 8|1@0+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_0 : 9|1@1+ (1,0) [0|1] "" XXX
+ SG_ RES_BTN : 10|1@0+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_2 : 11|3@1+ (1,0) [0|7] "" XXX
+ SG_ LKAS_ON_BTN : 14|1@0+ (1,0) [0|1] "" XXX
+ SG_ BTN_DIST_DOWN : 15|1@1+ (1,0) [0|1] "" XXX
+ SG_ BTN_DIST_UP : 16|1@1+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_0_2 : 17|2@1+ (1,0) [0|1] "" XXX
+ SG_ ACC_SWITCH : 19|1@1+ (1,0) [0|1] "" XXX
+ SG_ SET_ME_XFFFFF : 20|32@1+ (1,0) [0|68719476735] "" XXX
+ SG_ COUNTER : 52|4@1+ (1,0) [0|15] "" XXX
+ SG_ CHECKSUM : 56|8@1+ (1,0) [0|255] "" XXX
+
+BO_ 1048 BSM: 8 XXX
+ SG_ LEFT_APPROACH : 9|2@0+ (1,0) [0|1] "" XXX
+ SG_ RIGHT_APPROACH : 11|2@0+ (1,0) [0|1] "" XXX
+ SG_ APPROACH : 17|1@0+ (1,0) [0|1] "" XXX
+
+BO_ 1172 BRAKE_APPLIED_2: 8 XXX
+ SG_ BRAKE_APPLIED_ACTIVE_LOW : 47|1@1+ (1,0) [0|1] "" XXX
+
+VAL_ 307 TURN_SIGNAL_SWITCH 0 "Invalid" 1 "OFFGear" 2 "LeftSteeringShortLift" 3 "LeftSteeringLongLift" 4 "RightSteeringShortLift" 5 "RightSteeringLongLift" 7 "Unavaliable";
+VAL_ 508 TORQUE_TEMP_FAILED 2 "TooFast" 1 "TooLarge" 3 "Both";
+VAL_ 530 GEAR 4 "D" 2 "R" 3 "N" 1 "P";
+VAL_ 536 EPB_ACTIVE 0 "NotActive" 1 "Release" 2 "Apply" 3 "Reserved";
+VAL_ 536 EPB_STATUS 0 "Releasing" 1 "Released" 2 "Applying" 3 "Applied" 4 "FaultProhibitionOfRemoteDriving";
+VAL_ 578 GEAR 4 "D" 2 "R" 3 "N" 1 "P";
+VAL_ 790 Config 3 "FULL_TERRAIN" 2 "LKAS" 1 "ALERT" 0 "DISABLE";
+VAL_ 790 LKAS_Mode 0 "OFF" 1 "Passive" 2 "Active1" 3 "Active2" 4 "Fault" 5 "StandBy";
+VAL_ 813 SET_DISTANCE 4 "4bar" 3 "3bar" 2 "2bar" 1 "1bar";
+VAL_ 813 NOTIFY 4 "OVERRIDE" 3 "ENGAGE" 2 "DISENGAGE" 7 "ACC_ON" 8 "ACC_OFF" 0 "NONE";
+VAL_ 813 CRUISE_STATE 0 "OFF" 1 "Passive" 2 "StandBy" 3 "Active" 4 "BrakeOnly" 5 "Override" 6 "StandStillActive" 7 "StandStillWait" 8 "Failure" 9 "PermanentFailure";
+VAL_ 834 DRIVE_MODE 3 "NORMAL" 2 "SPORT" 1 "ECO";
+VAL_ 834 POWER_MODE 3 "HEV" 2 "FORCE_EV" 1 "EV";
+VAL_ 944 BTN_ACC_DEC 4 "ACC 10" 3 "ACC 1" 2
