@@ -98,24 +98,57 @@ def dump_from_route(route_dir=None):
   print(f"reading {log_path} ...")
 
   stats = {}
+  tx_stats = {}
+  cruise_states = defaultdict(int)
+  lkas_active_count = [0, 0]  # [active, total] from camera's 790 on bus 2
   n_frames = 0
   for m in LogReader(log_path):
-    if m.which() != "can":
+    w = m.which()
+    if w not in ("can", "sendcan"):
       continue
     t = m.logMonoTime * 1e-9
-    for f in m.can:
-      if f.src >= 128:
+    frames = m.can if w == "can" else m.sendcan
+    target = stats if w == "can" else tx_stats
+    for f in frames:
+      if w == "can" and f.src >= 128:
         continue
       key = (f.src, f.address)
-      if key not in stats:
-        stats[key] = [len(f.dat), 0, t, t]
-      s = stats[key]
+      if key not in target:
+        target[key] = [len(f.dat), 0, t, t]
+      s = target[key]
       s[1] += 1
       s[3] = t
       n_frames += 1
 
+      # decode ADAS cruise state (813 ACC_HUD_ADAS): CRUISE_STATE = byte5 >> 4 & 0xF
+      if f.address == 813 and len(f.dat) >= 6:
+        cruise_states[(f.dat[5] >> 4) & 0xF] += 1
+      # decode camera LKAS active (790 MPC_LKAS_CMD): LKAS_ACTIVE = bit 28 = byte3 bit4
+      if f.address == 790 and f.src == 2 and len(f.dat) >= 4:
+        lkas_active_count[1] += 1
+        if (f.dat[3] >> 4) & 0x1:
+          lkas_active_count[0] += 1
+
   print(f"{n_frames} CAN frames")
+  print("\n--- received (car -> panda) ---")
   print_table(stats)
+  if tx_stats:
+    print("\n--- openpilot TX (sendcan) ---")
+    print_table(tx_stats)
+
+  if cruise_states:
+    names = {0: "Off", 1: "Standby", 3: "ACTIVE", 5: "Override", 8: "FAILURE", 9: "PERMANENT_FAILURE"}
+    print("\n--- ACC_HUD_ADAS CRUISE_STATE histogram ---")
+    for state, count in sorted(cruise_states.items()):
+      print(f"  state {state:>2} ({names.get(state, '?')}): {count}")
+    if cruise_states.get(8, 0) or cruise_states.get(9, 0):
+      print("  !!! ADAS still in FAILURE state !!!")
+    else:
+      print("  OK: no failure states — ADAS ECU healthy")
+
+  if lkas_active_count[1]:
+    pct = 100.0 * lkas_active_count[0] / lkas_active_count[1]
+    print(f"\n--- camera 790 LKAS_ACTIVE: {lkas_active_count[0]}/{lkas_active_count[1]} frames ({pct:.0f}%) ---")
 
 
 def dump_live(seconds):
