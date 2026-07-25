@@ -200,6 +200,26 @@
     ],
     "package": "Driver Confidence Package 2"
   },
+  "BYD HAN EV 2023": {
+    "platform": "BYD_HAN_EV_23",
+    "make": "BYD",
+    "brand": "byd",
+    "model": "HAN EV",
+    "year": [
+      "2023"
+    ],
+    "package": "All"
+  },
+  "BYD SEAL PERFORMANCE 2025": {
+    "platform": "BYD_SEAL_PERFORMANCE_25",
+    "make": "BYD",
+    "brand": "byd",
+    "model": "SEAL PERFORMANCE",
+    "year": [
+      "2025"
+    ],
+    "package": "All"
+  },
   "Cadillac Escalade 2017": {
     "platform": "CADILLAC_ESCALADE",
     "make": "Cadillac",
