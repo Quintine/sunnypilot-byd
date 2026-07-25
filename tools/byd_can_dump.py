@@ -151,6 +151,99 @@ def dump_from_route(route_dir=None):
     print(f"\n--- camera 790 LKAS_ACTIVE: {lkas_active_count[0]}/{lkas_active_count[1]} frames ({pct:.0f}%) ---")
 
 
+# byd_checksum from opendbc.car.byd.bydcan (recomputed over 8 bytes with the
+# CHECKSUM byte zeroed) — used to verify the algorithm against real frames
+def byd_checksum(data):
+  byte_key = 0xAF
+  sum_first = sum(byte >> 4 for byte in data)
+  sum_second = sum(byte & 0xF for byte in data)
+  remainder = sum_second >> 4
+  sum_first += (byte_key & 0xF)
+  sum_second += (byte_key >> 4)
+  inv_first = ((-sum_first + 0x9) & 0xF)
+  inv_second = ((-sum_second + 0x9) & 0xF)
+  return (((inv_first + (5 - remainder)) << 4) + inv_second) & 0xFF
+
+
+def verify_checksums(route_dir=None, addrs=(508, 482, 790, 792, 814, 813)):
+  """Recompute byd_checksum for each CHECKSUM'd message and report match rates."""
+  from openpilot.tools.lib.logreader import LogReader
+
+  base = "/data/media/0/realdata"
+  if route_dir is None:
+    log_path = find_latest_log(base)
+    assert log_path is not None, f"no routes with rlog/qlog found in {base}"
+  else:
+    log_path = find_log_file(route_dir)
+    assert log_path is not None, f"no rlog/qlog found in {route_dir}"
+  print(f"reading {log_path} ...")
+
+  results = defaultdict(lambda: [0, 0])  # addr -> [matches, total]
+  samples = defaultdict(list)
+  for m in LogReader(log_path):
+    if m.which() != "can":
+      continue
+    for f in m.can:
+      if f.src >= 128 or f.address not in addrs or len(f.dat) != 8:
+        continue
+      data = bytearray(f.dat)
+      expected = data[7]
+      data[7] = 0
+      match = byd_checksum(data) == expected
+      results[f.address][1] += 1
+      if match:
+        results[f.address][0] += 1
+      elif len(samples[f.address]) < 3:
+        samples[f.address].append((bytes(f.dat).hex(), expected, byd_checksum(data)))
+
+  print("\n--- byd_checksum verification (CHECKSUM byte = last byte) ---")
+  for addr in sorted(results):
+    matches, total = results[addr]
+    name = KEY_ADDRS.get(addr, "")
+    status = "OK" if matches == total else "!!! MISMATCH !!!"
+    print(f"  {addr:>4} {name:<24} {matches}/{total} ({100.0 * matches / max(total, 1):.1f}%)  {status}")
+    for raw, exp, got in samples[addr]:
+      print(f"       sample {raw}  expected={exp:#04x} computed={got:#04x}")
+
+
+def decode_508_failures(route_dir=None):
+  """Histogram TORQUE_FAILED / TORQUE_TEMP_FAILED / LKSPrepare / Cruise_Activated
+  from stock 508 STEERING_TORQUE_ANGLE frames (bus 0)."""
+  from openpilot.tools.lib.logreader import LogReader
+
+  base = "/data/media/0/realdata"
+  if route_dir is None:
+    log_path = find_latest_log(base)
+    assert log_path is not None, f"no routes with rlog/qlog found in {base}"
+  else:
+    log_path = find_log_file(route_dir)
+    assert log_path is not None, f"no rlog/qlog found in {route_dir}"
+  print(f"reading {log_path} ...")
+
+  tf = defaultdict(int)
+  ttf = defaultdict(int)
+  prepare = defaultdict(int)
+  activated = defaultdict(int)
+  total = 0
+  for m in LogReader(log_path):
+    if m.which() != "can":
+      continue
+    for f in m.can:
+      if f.src >= 128 or f.address != 508 or len(f.dat) < 6:
+        continue
+      total += 1
+      tf[f.dat[0] & 0x4] += 1              # TORQUE_FAILED bit 2
+      ttf[(f.dat[5] >> 6) & 0x3] += 1      # TORQUE_TEMP_FAILED bits 46-47 -> byte5 bits 6-7
+      prepare[f.dat[0] & 0x1] += 1         # LKSPrepare bit 0
+      activated[(f.dat[0] >> 1) & 0x1] += 1  # Cruise_Activated bit 1
+
+  print(f"\n--- 508 STEERING_TORQUE_ANGLE decode ({total} frames) ---")
+  print(f"  TORQUE_FAILED:      {dict(tf)}")
+  print(f"  TORQUE_TEMP_FAILED: {dict(ttf)}")
+  print(f"  LKSPrepare:         {dict(prepare)}")
+  print(f"  Cruise_Activated:   {dict(activated)}")
+
+
 def dump_live(seconds):
   from panda import Panda
   from opendbc.car.structs import CarParams
@@ -186,9 +279,17 @@ if __name__ == "__main__":
   ap.add_argument("--live", type=int, metavar="SECONDS", default=0,
                   help="sniff live via panda for N seconds (stop manager first!)")
   ap.add_argument("--route", type=str, default=None, help="route dir to analyze instead of latest")
+  ap.add_argument("--verify-checksums", action="store_true",
+                  help="verify byd_checksum algorithm against real 508/790/792/814 frames")
+  ap.add_argument("--decode-508", action="store_true",
+                  help="histogram TORQUE_FAILED / LKSPrepare / Cruise_Activated from stock 508 frames")
   args = ap.parse_args()
 
   if args.live:
     dump_live(args.live)
+  elif args.verify_checksums:
+    verify_checksums(args.route)
+  elif args.decode_508:
+    decode_508_failures(args.route)
   else:
     dump_from_route(args.route)
