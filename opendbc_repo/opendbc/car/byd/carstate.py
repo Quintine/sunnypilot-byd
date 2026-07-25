@@ -22,6 +22,10 @@ class CarState(CarStateBase, MadsCarState):
     else:
       self.steer_msg = "STEERING_TORQUE"
 
+    # ADAS cruise state (ACC_HUD_ADAS) and stock ACC echo (ACC_CMD) are on
+    # the vehicle CAN (bus 0) on the SEAL, camera CAN (bus 2) on the HAN
+    self.adas_on_pt_bus = CP.carFingerprint == CAR.BYD_SEAL_PERFORMANCE_25
+
     self.mpc_lkas_cmd_msg = None
     self.eps_steering_torque_msg = None
     self.eps_prepared = False
@@ -35,6 +39,7 @@ class CarState(CarStateBase, MadsCarState):
   def update(self, can_parsers) -> tuple[structs.CarState, structs.CarStateSP]:
     cp = can_parsers[Bus.pt]
     cp_cam = can_parsers[Bus.cam]
+    cp_adas = cp if self.adas_on_pt_bus else cp_cam
     ret = structs.CarState()
     ret_sp = structs.CarStateSP()
 
@@ -59,13 +64,13 @@ class CarState(CarStateBase, MadsCarState):
     ret.steerFaultPermanent = cp.vl[self.steer_msg]["TORQUE_FAILED"] != 0
     ret.steerFaultTemporary = cp.vl[self.steer_msg]["TORQUE_FAILED"] != 0
 
-    ret.stockAeb = cp_cam.vl["ACC_HUD_ADAS"]["AEB"] == 1
-    ret.stockFcw = cp_cam.vl["ACC_HUD_ADAS"]["FCW"] == 1  # Forward Collision Warning
+    ret.stockAeb = cp_adas.vl["ACC_HUD_ADAS"]["AEB"] == 1
+    ret.stockFcw = cp_adas.vl["ACC_HUD_ADAS"]["FCW"] == 1  # Forward Collision Warning
 
     # Cruise state
-    ret.cruiseState.enabled = cp_cam.vl["ACC_HUD_ADAS"]["CRUISE_STATE"] in (3, 5)  # (Active, Override)
-    ret.cruiseState.speed = cp_cam.vl["ACC_HUD_ADAS"]["SET_SPEED"] * 10 * CV.KPH_TO_MS
-    ret.cruiseState.available = cp_cam.vl["ACC_HUD_ADAS"]["CRUISE_STATE"] not in (8, 9)  # (Failure, PermanentFailure)
+    ret.cruiseState.enabled = cp_adas.vl["ACC_HUD_ADAS"]["CRUISE_STATE"] in (3, 5)  # (Active, Override)
+    ret.cruiseState.speed = cp_adas.vl["ACC_HUD_ADAS"]["SET_SPEED"] * 10 * CV.KPH_TO_MS
+    ret.cruiseState.available = cp_adas.vl["ACC_HUD_ADAS"]["CRUISE_STATE"] not in (8, 9)  # (Failure, PermanentFailure)
     ret.cruiseState.standstill = False  # This needs to be false, since we can resume from stop without sending anything special
 
     # Gear
@@ -102,7 +107,7 @@ class CarState(CarStateBase, MadsCarState):
     self.mpc_lkas_active = cp_cam.vl["MPC_LKAS_CMD"]["LKAS_ACTIVE"] != 0
     self.mpc_lkas_request_prepare = cp_cam.vl["MPC_LKAS_CMD"]["LKASPrepare"] != 0
     # for generate ACC_CMD
-    self.acc_cmd_msg = copy.copy(cp_cam.vl["ACC_CMD"])
+    self.acc_cmd_msg = copy.copy(cp_adas.vl["ACC_CMD"])
     return ret, ret_sp
 
   @staticmethod
@@ -123,6 +128,23 @@ class CarState(CarStateBase, MadsCarState):
       ("PCM_BUTTONS", float('nan')),
     ]
 
+    cam_messages = [
+      # stock camera command echoes, only present when stock ADAS is active
+      ("MPC_LKAS_CMD", float('nan')),
+      # SEAL camera also broadcasts an angle-based LKAS command (parsed for future use)
+      ("MPC_LKAS_CMD_ANGLE", float('nan')),
+      # PCM_BUTTONS may be forwarded on the camera bus on some harnesses
+      ("PCM_BUTTONS", float('nan')),
+    ]
+
+    # ADAS cruise state and stock ACC echo: vehicle CAN (bus 0) on the SEAL,
+    # camera CAN (bus 2) on the HAN. Alive-check ACC_HUD_ADAS only on the bus it lives on.
+    adas_messages = [("ACC_HUD_ADAS", 10), ("ACC_CMD", float('nan'))]
+    if CP.carFingerprint == CAR.BYD_SEAL_PERFORMANCE_25:
+      pt_messages.extend(adas_messages)
+    else:
+      cam_messages.extend(adas_messages)
+
     # EPS steering feedback message differs by platform; alive-check only
     # the one this car has, parse the other opportunistically
     if CP.carFingerprint == CAR.BYD_SEAL_PERFORMANCE_25:
@@ -131,15 +153,6 @@ class CarState(CarStateBase, MadsCarState):
     else:
       pt_messages.append(("STEERING_TORQUE", 10))
       pt_messages.append(("STEERING_TORQUE_ANGLE", float('nan')))
-
-    cam_messages = [
-      ("ACC_HUD_ADAS", 10),
-      # stock camera command echoes, only present when stock ADAS is active
-      ("MPC_LKAS_CMD", float('nan')),
-      ("ACC_CMD", float('nan')),
-      # PCM_BUTTONS may be forwarded on the camera bus on some harnesses
-      ("PCM_BUTTONS", float('nan')),
-    ]
 
     return {
       Bus.pt: CANParser(DBC[CP.carFingerprint][Bus.pt], pt_messages, CANBUS.main_bus),

@@ -32,8 +32,11 @@ class CarInterface(CarInterfaceBase):
       CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
 
     # longitudinal control parameters
-    ret.alphaLongitudinalAvailable = True
-    if alpha_long:
+    # HAN: openpilot long available (ACC_CMD replaced on the tapped camera bus).
+    # SEAL: stock ACC_CMD is broadcast directly on the vehicle CAN (bus 0),
+    # so it cannot be intercepted/replaced by the panda — stock ACC only (MADS).
+    ret.alphaLongitudinalAvailable = candidate != CAR.BYD_SEAL_PERFORMANCE_25
+    if alpha_long and ret.alphaLongitudinalAvailable:
       ret.openpilotLongitudinalControl = True
       ret.startingState = True
       ret.startAccel = 0.1

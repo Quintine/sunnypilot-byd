@@ -65,6 +65,13 @@ static bool byd_tx_hook(const CANPacket_t *msg) {
 }
 
 static void byd_rx_hook(const CANPacket_t *msg) {
+  // ACC_HUD_ADAS: cruise state. Vehicle CAN (bus 0) on SEAL, camera CAN (bus 2) on HAN
+  if (msg->addr == 813U) {
+    // CRUISE_STATE in (3, 5) == (Active, Override)
+    uint8_t cruise_state = (msg->data[5] >> 4U) & 0x0FU;
+    pcm_cruise_check((cruise_state == 3U) || (cruise_state == 5U));
+  }
+
   // Main Bus
   if (msg->bus == 0U) {
     // PEDAL
@@ -101,15 +108,6 @@ static void byd_rx_hook(const CANPacket_t *msg) {
     if (msg->addr == 944U) {
       mads_button_press = GET_BIT(msg, BYD_LKAS_ON_BTN_BIT) ? MADS_BUTTON_PRESSED : MADS_BUTTON_NOT_PRESSED;
     }
-  }
-  // Cam Bus
-  else if (msg->bus == 2U) {
-    // ACC_HUD_ADAS
-    if (msg->addr == 813U) {
-      // CRUISE_STATE in (3, 5) == (Active, Override)
-      uint8_t cruise_state = (msg->data[5] >> 4U) & 0x0FU;
-      pcm_cruise_check((cruise_state == 3U) || (cruise_state == 5U));
-    }
   } else {
   }
 }
@@ -134,8 +132,10 @@ static safety_config byd_init(uint16_t param) {
     {.msg = {{287, 0, 5, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // STEER_MODULE
     {.msg = {{792, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true},              // STEERING_TORQUE (HAN)
              {508, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }}},   // STEERING_TORQUE_ANGLE (SEAL)
-    {.msg = {{944, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // PCM_BUTTONS
-    {.msg = {{813, 2, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // ACC_HUD_ADAS
+    {.msg = {{944, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true},              // PCM_BUTTONS (vehicle CAN)
+             {944, 2, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }}},   // PCM_BUTTONS (camera CAN)
+    {.msg = {{813, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true},              // ACC_HUD_ADAS (SEAL: vehicle CAN)
+             {813, 2, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }}},   // ACC_HUD_ADAS (HAN: camera CAN)
     {.msg = {{307, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // STALKS
     {.msg = {{660, 0, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // METER_CLUSTER
     {.msg = {{790, 2, 8, .ignore_checksum = true, .ignore_counter = true, .ignore_quality_flag = true}, { 0 }, { 0 }}},  // MPC_LKAS_CMD
