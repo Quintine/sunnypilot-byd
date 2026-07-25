@@ -22,8 +22,11 @@ Key BYD addresses it highlights:
 
 import argparse
 import os
+import sys
 import time
 from collections import defaultdict
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 KEY_ADDRS = {
   287: "STEER_MODULE",
@@ -59,23 +62,39 @@ def print_table(stats, started_mono=None):
       print(f"{addr:>6}  {length:>3}  {count:>7}  {rate:>7.1f}  {name}{marker}")
 
 
+LOG_NAMES = ("rlog", "rlog.bz2", "rlog.zst", "qlog", "qlog.bz2", "qlog.zst")
+
+
+def find_log_file(route_dir):
+  for name in LOG_NAMES:
+    p = os.path.join(route_dir, name)
+    if os.path.exists(p):
+      return p
+  return None
+
+
+def find_latest_log(base):
+  """Newest dir (by name) that actually contains an rlog/qlog; skips 'boot'."""
+  for d in sorted(os.listdir(base), reverse=True):
+    p = os.path.join(base, d)
+    if not os.path.isdir(p) or d == "boot":
+      continue
+    lp = find_log_file(p)
+    if lp is not None:
+      return lp
+  return None
+
+
 def dump_from_route(route_dir=None):
   from openpilot.tools.lib.logreader import LogReader
 
   base = "/data/media/0/realdata"
   if route_dir is None:
-    routes = sorted(d for d in os.listdir(base) if os.path.isdir(os.path.join(base, d)))
-    assert routes, f"no routes found in {base}"
-    route_dir = os.path.join(base, routes[-1])
-    print(f"using latest route: {route_dir}")
-
-  log_path = None
-  for name in ("rlog", "rlog.bz2", "rlog.zst", "qlog", "qlog.bz2", "qlog.zst"):
-    p = os.path.join(route_dir, name)
-    if os.path.exists(p):
-      log_path = p
-      break
-  assert log_path, f"no rlog/qlog found in {route_dir}"
+    log_path = find_latest_log(base)
+    assert log_path is not None, f"no routes with rlog/qlog found in {base}"
+  else:
+    log_path = find_log_file(route_dir)
+    assert log_path is not None, f"no rlog/qlog found in {route_dir}"
   print(f"reading {log_path} ...")
 
   stats = {}
