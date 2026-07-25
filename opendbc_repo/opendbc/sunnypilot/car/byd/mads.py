@@ -19,6 +19,12 @@ class MadsCarState(MadsCarStateBase):
 
   def update_mads(self, ret: structs.CarState, can_parsers: dict[StrEnum, CANParser]) -> None:
     cp = can_parsers[Bus.pt]
+    cp_cam = can_parsers[Bus.cam]
+
+    # PCM_BUTTONS bus assignment is harness dependent; read from whichever bus sees it
+    lkas_button = cp.vl["PCM_BUTTONS"]["LKAS_ON_BTN"]
+    if not cp.vl_all["PCM_BUTTONS"]["LKAS_ON_BTN"] and cp_cam.vl_all["PCM_BUTTONS"]["LKAS_ON_BTN"]:
+      lkas_button = cp_cam.vl["PCM_BUTTONS"]["LKAS_ON_BTN"]
 
     self.prev_lkas_button = self.lkas_button
-    self.lkas_button = cp.vl["PCM_BUTTONS"]["LKAS_ON_BTN"]
+    self.lkas_button = lkas_button

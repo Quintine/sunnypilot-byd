@@ -100,23 +100,30 @@ class CarState(CarStateBase, MadsCarState):
 
   @staticmethod
   def get_can_parsers(CP, CP_SP):
+    # Frequencies are deliberately conservative (10x timeout forgiveness):
+    # only messages required for control are alive-checked, everything
+    # optional/state-dependent is parsed but not alive-checked (nan).
     pt_messages = [
       # sig_address, frequency
-      ("ESC", 50),
-      ("BRAKE_APPLIED", 50),
-      ("PEDAL", 50),
-      ("STEER_MODULE", 100),
-      ("STEERING_TORQUE", 50),
-      ("DRIVE_STATE", 50),
-      ("STALKS", 20),
-      ("METER_CLUSTER", 20),
-      ("PCM_BUTTONS", 20),
+      ("ESC", 10),
+      ("BRAKE_APPLIED", 10),
+      ("PEDAL", 10),
+      ("STEER_MODULE", 10),
+      ("STEERING_TORQUE", 10),
+      ("DRIVE_STATE", 10),
+      ("STALKS", float('nan')),
+      ("METER_CLUSTER", float('nan')),
+      # steering wheel buttons; bus assignment is harness dependent
+      ("PCM_BUTTONS", float('nan')),
     ]
 
     cam_messages = [
-      ("ACC_HUD_ADAS", 50),
-      ("MPC_LKAS_CMD", 50),
-      ("ACC_CMD", 25),
+      ("ACC_HUD_ADAS", 10),
+      # stock camera command echoes, only present when stock ADAS is active
+      ("MPC_LKAS_CMD", float('nan')),
+      ("ACC_CMD", float('nan')),
+      # PCM_BUTTONS may be forwarded on the camera bus on some harnesses
+      ("PCM_BUTTONS", float('nan')),
     ]
 
     return {
